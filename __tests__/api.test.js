@@ -28,4 +28,12 @@ describe('GET /api/topics testing', () => {
             })
         })
     })
+    test('returns a 404 internal server error if the endpoint is not correct', () => {
+        return request(app)
+        .get('/notARoute')
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toBe('404 Not Found')
+        })
+    })
 })
