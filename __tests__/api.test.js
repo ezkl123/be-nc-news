@@ -3,6 +3,7 @@ const app = require('../app')
 const testData = require('../db/data/test-data/index')
 const db = require('../db/connection')
 const seed = require('../db/seeds/seed')
+const endpoints = require('../endpoints.json')
 
 beforeEach(() => {
     return seed(testData)
@@ -22,13 +23,25 @@ describe('GET /api/topics testing', () => {
             const topics = response.body.topics
             expect(topics.length).toBe(3)
             topics.forEach((topic) => {
-                expect(topic).toMatchObject(({slug: expect.any(String),
+                expect(topic).toMatchObject({slug: expect.any(String),
                     description: expect.any(String)
-                }));
+                });
             })
         })
     })
-    test('returns a 404 internal server error if the endpoint is not correct', () => {
+})
+describe('GET /api testing', () => {
+    test('returns with a 200 status code along with a nested object of endpoint objects', () => {
+        return request(app)
+        .get('/api')
+        .expect(200)
+        .then((response) => {
+            expect(response._body).toMatchObject(endpoints)
+        })
+    })
+})
+describe('General error testing (404 status code)', () => {
+    test('returns a 404 Not Found message if endpoint input is invalid', () => {
         return request(app)
         .get('/notARoute')
         .expect(404)

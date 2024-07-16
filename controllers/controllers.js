@@ -1,4 +1,5 @@
 const { getTopics } = require('../models/models')
+const endpoints = require('../endpoints.json')
 
 function sendTopics(req, res, next) {
     getTopics().then((topics) => {
@@ -9,4 +10,8 @@ function sendTopics(req, res, next) {
     })
 }
 
-module.exports = { sendTopics }
+function sendAllEndpoints(req, res, next){
+    res.status(200).send(endpoints)
+}
+
+module.exports = { sendTopics, sendAllEndpoints }
