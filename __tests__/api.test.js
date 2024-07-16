@@ -40,6 +40,44 @@ describe('GET /api testing', () => {
         })
     })
 })
+describe('GET /api/articles/:article_id', () => {
+    test('returns a 200 status code with an article object with the corresponding id', () => {
+        return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then((response) => {
+            // console.log(response.body.article)
+            expect(response.body.article).toEqual({
+                article_id: 1,
+                title: 'Living in the shadow of a great man',
+                topic: 'mitch',
+                author: 'butter_bridge',
+                body: 'I find this existence challenging',
+                created_at: '2020-07-09T20:11:00.000Z',
+                votes: 100,
+                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+              })
+        })
+    })
+    test('returns 400 Bad Request and the message "Not Found" when invalid parameter is inputted', () => {
+        return request(app)
+        .get('/api/articles/not-a-number')
+        .expect(400)
+        .then((response) => {
+            const error = response.body.msg;
+            expect(error).toBe('Bad Request')
+        })
+    })
+    test('returns 404 Not Found when a valid id is inputted that has empty content', () => {
+        return request(app)
+        .get('/api/articles/99')
+        .expect(404)
+        .then((response) => {
+            const error = response.body.msg
+            expect(error).toBe('Not Found')
+        })
+    })
+})
 describe('General error testing (404 status code)', () => {
     test('returns a 404 Not Found message if endpoint input is invalid', () => {
         return request(app)
