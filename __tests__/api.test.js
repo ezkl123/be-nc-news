@@ -19,7 +19,6 @@ describe('GET /api/topics testing', () => {
         .get('/api/topics')
         .expect(200)
         .then((response) => {
-            console.log(response.body)
             const topics = response.body.topics
             expect(topics.length).toBe(3)
             topics.forEach((topic) => {
@@ -30,6 +29,7 @@ describe('GET /api/topics testing', () => {
         })
     })
 })
+
 describe('GET /api testing', () => {
     test('returns with a 200 status code along with a nested object of endpoint objects', () => {
         return request(app)
@@ -40,6 +40,7 @@ describe('GET /api testing', () => {
         })
     })
 })
+
 describe('GET /api/articles/:article_id', () => {
     test('returns a 200 status code with an article object with the corresponding id', () => {
         return request(app)
@@ -78,6 +79,32 @@ describe('GET /api/articles/:article_id', () => {
         })
     })
 })
+
+describe.only('GET /api/articles', () => {
+    test('should return 200 and an array where each article object has all the relevant properties', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then((response) => {
+            const articles = response.body.articles
+            // console.log(articles)
+            expect(articles.length).toBe(13)
+            articles.forEach((article) => {
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                    comment_count: expect.any(Number)
+                });
+            })
+        })
+    })
+})
+
 describe('General error testing (404 status code)', () => {
     test('returns a 404 Not Found message if endpoint input is invalid', () => {
         return request(app)

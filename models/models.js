@@ -18,13 +18,38 @@ function getArticlebyId(article_id){
         }
         return rows[0]
     })
-    // .catch((err) => {
-    //     return err;
-    // })
 }
 
-//not sure how to access endpoint keys, seems to list numbers going up to 700 when i console.log. just console.logging endpoints gives the correct object from the file though.
-//not sure what kind of error codes to test for at what point - is 400 only for param queries?
-//what is the difference between db connection in setup-dbs in the package.json and the connection file?
+function getAllArticles(){
 
-module.exports = { getTopics, getArticlebyId }
+    return db.query(`
+        SELECT
+            articles.author,
+            articles.title,
+            articles.article_id,
+            articles.topic,
+            articles.created_at,
+            articles.votes,
+            articles.article_img_url,
+            COUNT(comments.comment_id) AS comment_count
+        FROM
+            articles
+        LEFT JOIN comments ON articles.article_id = comments.article_id
+        GROUP BY
+            articles.article_id
+        ORDER BY
+            articles.created_at DESC;`
+    ).then((response) => {
+        const rows = response.rows
+        // console.log(rows)
+        rows.forEach((article) => {
+            article.comment_count = Number(article.comment_count)
+        })
+        console.log(rows)
+        return rows;
+    })
+
+
+}
+
+module.exports = { getTopics, getArticlebyId, getAllArticles }
