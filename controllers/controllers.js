@@ -1,4 +1,4 @@
-const { getTopics, getArticlebyId, getAllArticles } = require('../models/models')
+const { getTopics, getArticlebyId, getAllArticles, getAllComments } = require('../models/models')
 const endpoints = require('../endpoints.json')
 
 function sendTopics(req, res, next) {
@@ -40,4 +40,19 @@ function sendAllArticles(req, res, next){
     })
 }
 
-module.exports = { sendTopics, sendAllEndpoints, sendArticleById, sendAllArticles }
+function sendAllComments(req, res, next){
+    const {article_id} = req.params;
+    getAllComments(article_id)
+    .then((comments) => {
+        if (comments === 'There are no comments about this article'){
+            const msg = comments
+            res.status(200).send({msg})
+        }
+        res.status(200).send({comments})
+    })
+    .catch((err) => {
+        next(err)
+    })
+}
+
+module.exports = { sendTopics, sendAllEndpoints, sendArticleById, sendAllArticles, sendAllComments }

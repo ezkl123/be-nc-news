@@ -44,12 +44,40 @@ function getAllArticles(){
         rows.forEach((article) => {
             article.comment_count = Number(article.comment_count)
         })
-        console.log(rows)
         return rows;
     })
 
 
 }
 
+function getAllComments(article_id){
+    if (isNaN(article_id)){
+        return Promise.reject({
+            status: 400,
+            msg: 'Bad Request'
+        })
+    }
+    return db.query(`SELECT * FROM articles 
+        WHERE articles.article_id = $1`, [article_id])
+    .then(({rows}) => {
+        const articles = rows;
+        if (articles.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: 'Not Found'
+            })
+        }
+        return db.query(`SELECT comment_id, votes, created_at, author, body, article_id FROM comments
+            WHERE article_id = $1
+            ORDER BY created_at DESC`, [article_id])
+        .then(({rows}) => {
+            if (rows.length === 0){
+                return Promise.resolve('There are no comments about this article')
+            }
+            return rows;
+        })
+    })
+}
 
-module.exports = { getTopics, getArticlebyId, getAllArticles }
+
+module.exports = { getTopics, getArticlebyId, getAllArticles, getAllComments }

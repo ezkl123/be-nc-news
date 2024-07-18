@@ -80,7 +80,7 @@ describe('GET /api/articles/:article_id', () => {
     })
 })
 
-describe.only('GET /api/articles', () => {
+describe('GET /api/articles', () => {
     test('should return 200 and an array where each article object has all the relevant properties', () => {
         return request(app)
         .get('/api/articles')
@@ -104,13 +104,13 @@ describe.only('GET /api/articles', () => {
     })
 })
 
-describe('/api/articles/:article_id/comments testing', () => {
+describe.only('/api/articles/:article_id/comments testing', () => {
     test('returns a 200 status and an array of comments for an article accessed by a valid id', () => {
         return request(app)
         .get('/api/articles/1/comments')
         .expect(200)
         .then((response) => {
-            const comments = response.comments;
+            const comments = response.body.comments;
             comments.forEach((comment) => {
                 expect(comment).toMatchObject({
                     comment_id: expect.any(Number),
@@ -123,8 +123,42 @@ describe('/api/articles/:article_id/comments testing', () => {
             })
         })
     })
+    test('returned comment array should have the most recent comments first', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then((response) => {
+            const comments = response.body.comments;
+            expect(comments).toBeSortedBy('created_at', {descending: true})
+        })
+    })
+    test('returns 200 with the message "There are no comments about this article" when article_id is valid and the article exists but no comments are in the array', () => {
+        return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('There are no comments about this article')
+        })
+    })
+    test('returns 400 Bad Request when invalid article_id is inputted', () => {
+        return request(app)
+        .get('/api/articles/twenty/comments')
+        .expect(400)
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('Bad Request')
+        })
+    })
+    test('returns 404 Not Found when article_id is valid but the article does not exist', () => {
+        return request(app)
+        .get('/api/articles/99/comments')
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('Not Found')
+        })
+    })
 })
-
 describe('General error testing (404 status code)', () => {
     test('returns a 404 Not Found message if endpoint input is invalid', () => {
         return request(app)
