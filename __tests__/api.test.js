@@ -104,7 +104,7 @@ describe('GET /api/articles', () => {
     })
 })
 
-describe.only('/api/articles/:article_id/comments testing', () => {
+describe('/api/articles/:article_id/comments testing', () => {
     test('returns a 200 status and an array of comments for an article accessed by a valid id', () => {
         return request(app)
         .get('/api/articles/1/comments')
