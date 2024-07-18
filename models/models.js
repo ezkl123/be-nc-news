@@ -41,7 +41,6 @@ function getAllArticles(){
             articles.created_at DESC;`
     ).then((response) => {
         const rows = response.rows
-        // console.log(rows)
         rows.forEach((article) => {
             article.comment_count = Number(article.comment_count)
         })
@@ -51,5 +50,6 @@ function getAllArticles(){
 
 
 }
+
 
 module.exports = { getTopics, getArticlebyId, getAllArticles }
