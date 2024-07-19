@@ -153,12 +153,96 @@ describe('/api/articles/:article_id/comments testing', () => {
     test('returns 404 Not Found when article_id is valid but the article does not exist', () => {
         return request(app)
         .get('/api/articles/99/comments')
+        .expect(404)
         .then((response) => {
             const msg = response.body.msg;
             expect(msg).toBe('Not Found')
         })
     })
 })
+
+describe.only('POST /api/articles/:article_id/comments', () => {
+    test('returns 200 with the posted comment', () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({
+            username: 'butter_bridge',
+            body: 'What a cool article'
+        })
+        .expect(200)
+        .then((response) => {
+            const comment = response.body.comment[0];
+            expect(comment.body).toBe('What a cool article')
+        })
+    })
+    test('if username is missing, returns 400 with the error message: "Please enter a valid username"', () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({
+            username: undefined,
+            body: 'What a cool article'
+        })
+        .expect(400)
+        .then((response) => {
+            const error = response.body.msg;
+            expect(error).toBe('Please enter a valid username')
+        })
+    })
+    test('if body is missing, returns 400 with the error message: "Please enter a valid username"', () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({
+            username: 'butter_bridge',
+            body: undefined
+        })
+        .expect(400)
+        .then((response) => {
+            const error = response.body.msg;
+            expect(error).toBe('Please enter a valid comment')
+        })
+    })
+    test('returns 400 Bad Request when invalid article_id is inputted', () => {
+        return request(app)
+        .post('/api/articles/twenty/comments')
+        .send({
+            username: 'butter_bridge',
+            body: 'What a cool article'
+        })
+        .expect(400)
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('Bad Request')
+        })
+    })
+    test('returns 404 Not Found when article_id is valid but the article does not exist', () => {
+        return request(app)
+        .post('/api/articles/99/comments')
+        .send({
+            username: 'butter_bridge',
+            body: 'What a cool article'
+        })
+        .expect(404)
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('Article Not Found')
+        })
+    })
+    test("if the username is valid but doesn't exist, returns 404 with the message 'Username not found'.", () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({
+            username: 'Hammad',
+            body: 'What a cool article'
+        })
+        .expect(404)
+        .then((response) => {
+            const error = response.body.msg;
+            expect(error).toBe('Username does not exist')
+        })
+    })
+
+})
+
 describe('General error testing (404 status code)', () => {
     test('returns a 404 Not Found message if endpoint input is invalid', () => {
         return request(app)

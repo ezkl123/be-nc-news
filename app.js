@@ -1,7 +1,9 @@
 const express = require('express')
-const { sendTopics, sendAllEndpoints, sendArticleById, sendAllArticles, sendAllComments } = require('./controllers/controllers')
+const { sendTopics, sendAllEndpoints, sendArticleById, sendAllArticles, sendAllComments, postComments } = require('./controllers/controllers')
 
 const app = express()
+
+app.use(express.json())
 
 app.get('/api/topics', sendTopics)
 
@@ -13,7 +15,10 @@ app.get('/api/articles', sendAllArticles)
 
 app.get('/api/articles/:article_id/comments', sendAllComments)
 
-app.all('*', (req, res, next) => {
+app.post('/api/articles/:article_id/comments', postComments)
+
+app.all('*', (err, req, res, next) => {
+    console.log(err)
     res.status(404).send({msg: '404 Not Found'})
 })
 
@@ -34,7 +39,15 @@ app.use((err, req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-    // console.log(err);
+    if (err.code === '23503'){
+        res.status(404).send({msg: 'Username does not exist'})
+    } else {
+        next(err)
+    }
+})
+
+app.use((err, req, res, next) => {
+    console.log(err);
     res.status(500).send({msg: 'Internal Server Error'})
 })
 
