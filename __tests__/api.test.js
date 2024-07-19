@@ -307,3 +307,34 @@ describe('PATCH /api/articles/:article_id', () => {
         })
     })
 })
+
+describe('DELETE /api/comments/:comment_id', () => {
+    test('returns 204 when a comment is successfully deleted', () => {
+        return request(app)
+        .delete('/api/comments/1')
+        .expect(204)
+        .then((response) => {
+            expect(response.statusCode).toBe(204)
+        })
+    })
+
+    test('returns 404 Not Found when comment_id is valid but the comment does not exist', () => {
+        return request(app)
+        .delete('/api/comments/99')
+        .expect(404)
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('Comment Not Found')
+        })
+    })
+
+    test('returns 400 Bad Request when invalid comment_id is input', () => {
+        return request(app)
+        .delete('/api/comments/twenty')
+        .expect(400)
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('Bad Request')
+        })
+    })
+})

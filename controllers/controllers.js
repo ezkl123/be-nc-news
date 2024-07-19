@@ -1,4 +1,4 @@
-const { getTopics, getArticlebyId, getAllArticles, getAllComments, addComments, updateArticle } = require('../models/models')
+const { getTopics, getArticlebyId, getAllArticles, getAllComments, addComments, updateArticle, deleteComment } = require('../models/models')
 const endpoints = require('../endpoints.json')
 
 function sendTopics(req, res, next) {
@@ -82,4 +82,15 @@ function sendUpdatedArticle(req, res, next){
     })
 }
 
-module.exports = { sendTopics, sendAllEndpoints, sendArticleById, sendAllArticles, sendAllComments, postComments, sendUpdatedArticle }
+function sendDeleteResponse(req, res, next){
+    const {comment_id} = req.params;
+    return deleteComment(comment_id)
+    .then((response) => {
+        res.status(204).send({})
+    })
+    .catch((err) => {
+        next(err)
+    })
+}
+
+module.exports = { sendTopics, sendAllEndpoints, sendArticleById, sendAllArticles, sendAllComments, postComments, sendUpdatedArticle, sendDeleteResponse }

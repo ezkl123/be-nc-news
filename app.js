@@ -19,7 +19,7 @@ app.post('/api/articles/:article_id/comments', postComments)
 
 app.patch('/api/articles/:article_id', sendUpdatedArticle)
 
-app.delete('/api/comment/:comment_id', sendDeleteResponse)
+app.delete('/api/comments/:comment_id', sendDeleteResponse)
 
 app.use((err, req, res, next) => {
     if (err.status && err.msg){

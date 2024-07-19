@@ -142,5 +142,22 @@ function updateArticle(articleId, incVotes){
     })
 }
 
+function deleteComment(comment_id){
+    return db.query('SELECT * FROM comments WHERE comment_id >= $1', [comment_id])
+    .then(({rows}) => {
+        if (rows.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: 'Comment Not Found'
+            })
+        }
 
-module.exports = { getTopics, getArticlebyId, getAllArticles, getAllComments, addComments, updateArticle }
+        return db.query(`DELETE FROM comments WHERE comment_id = $1`, [comment_id])
+        .then(({}) => {
+            return {};
+        })
+    })
+}
+
+
+module.exports = { getTopics, getArticlebyId, getAllArticles, getAllComments, addComments, updateArticle, deleteComment }
