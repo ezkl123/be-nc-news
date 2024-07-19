@@ -17,11 +17,6 @@ app.get('/api/articles/:article_id/comments', sendAllComments)
 
 app.post('/api/articles/:article_id/comments', postComments)
 
-app.all('*', (err, req, res, next) => {
-    console.log(err)
-    res.status(404).send({msg: '404 Not Found'})
-})
-
 app.use((err, req, res, next) => {
     if (err.status && err.msg){
         res.status(err.status).send({msg: err.msg})
@@ -50,6 +45,5 @@ app.use((err, req, res, next) => {
     console.log(err);
     res.status(500).send({msg: 'Internal Server Error'})
 })
-
 
 module.exports = app;

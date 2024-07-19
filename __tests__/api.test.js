@@ -161,7 +161,7 @@ describe('/api/articles/:article_id/comments testing', () => {
     })
 })
 
-describe.only('POST /api/articles/:article_id/comments', () => {
+describe('POST /api/articles/:article_id/comments', () => {
     test('returns 200 with the posted comment', () => {
         return request(app)
         .post('/api/articles/2/comments')
@@ -241,15 +241,4 @@ describe.only('POST /api/articles/:article_id/comments', () => {
         })
     })
 
-})
-
-describe('General error testing (404 status code)', () => {
-    test('returns a 404 Not Found message if endpoint input is invalid', () => {
-        return request(app)
-        .get('/notARoute')
-        .expect(404)
-        .then((response) => {
-            expect(response.body.msg).toBe('404 Not Found')
-        })
-    })
 })
