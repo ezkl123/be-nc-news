@@ -60,6 +60,7 @@ describe('GET /api/articles/:article_id', () => {
               })
         })
     })
+
     test('returns 400 Bad Request and the message "Not Found" when invalid parameter is inputted', () => {
         return request(app)
         .get('/api/articles/not-a-number')
@@ -69,6 +70,7 @@ describe('GET /api/articles/:article_id', () => {
             expect(error).toBe('Bad Request')
         })
     })
+
     test('returns 404 Not Found when a valid id is inputted that has empty content', () => {
         return request(app)
         .get('/api/articles/99')
@@ -123,6 +125,7 @@ describe('/api/articles/:article_id/comments testing', () => {
             })
         })
     })
+
     test('returned comment array should have the most recent comments first', () => {
         return request(app)
         .get('/api/articles/1/comments')
@@ -132,6 +135,7 @@ describe('/api/articles/:article_id/comments testing', () => {
             expect(comments).toBeSortedBy('created_at', {descending: true})
         })
     })
+
     test('returns 200 with the message "There are no comments about this article" when article_id is valid and the article exists but no comments are in the array', () => {
         return request(app)
         .get('/api/articles/2/comments')
@@ -141,6 +145,7 @@ describe('/api/articles/:article_id/comments testing', () => {
             expect(msg).toBe('There are no comments about this article')
         })
     })
+
     test('returns 400 Bad Request when invalid article_id is inputted', () => {
         return request(app)
         .get('/api/articles/twenty/comments')
@@ -150,6 +155,7 @@ describe('/api/articles/:article_id/comments testing', () => {
             expect(msg).toBe('Bad Request')
         })
     })
+
     test('returns 404 Not Found when article_id is valid but the article does not exist', () => {
         return request(app)
         .get('/api/articles/99/comments')
@@ -162,19 +168,20 @@ describe('/api/articles/:article_id/comments testing', () => {
 })
 
 describe('POST /api/articles/:article_id/comments', () => {
-    test('returns 200 with the posted comment', () => {
+    test('returns 201 with the posted comment', () => {
         return request(app)
         .post('/api/articles/2/comments')
         .send({
             username: 'butter_bridge',
             body: 'What a cool article'
         })
-        .expect(200)
+        .expect(201)
         .then((response) => {
             const comment = response.body.comment[0];
             expect(comment.body).toBe('What a cool article')
         })
     })
+
     test('if username is missing, returns 400 with the error message: "Please enter a valid username"', () => {
         return request(app)
         .post('/api/articles/2/comments')
@@ -188,6 +195,7 @@ describe('POST /api/articles/:article_id/comments', () => {
             expect(error).toBe('Please enter a valid username')
         })
     })
+
     test('if body is missing, returns 400 with the error message: "Please enter a valid username"', () => {
         return request(app)
         .post('/api/articles/2/comments')
@@ -201,6 +209,7 @@ describe('POST /api/articles/:article_id/comments', () => {
             expect(error).toBe('Please enter a valid comment')
         })
     })
+
     test('returns 400 Bad Request when invalid article_id is inputted', () => {
         return request(app)
         .post('/api/articles/twenty/comments')
@@ -214,6 +223,7 @@ describe('POST /api/articles/:article_id/comments', () => {
             expect(msg).toBe('Bad Request')
         })
     })
+
     test('returns 404 Not Found when article_id is valid but the article does not exist', () => {
         return request(app)
         .post('/api/articles/99/comments')
@@ -227,6 +237,7 @@ describe('POST /api/articles/:article_id/comments', () => {
             expect(msg).toBe('Article Not Found')
         })
     })
+
     test("if the username is valid but doesn't exist, returns 404 with the message 'Username not found'.", () => {
         return request(app)
         .post('/api/articles/2/comments')
@@ -240,5 +251,59 @@ describe('POST /api/articles/:article_id/comments', () => {
             expect(error).toBe('Username does not exist')
         })
     })
+})
 
+describe('PATCH /api/articles/:article_id', () => {
+    test('returns 200 with the updated number of votes in the article', () => {
+        return request(app)
+        .patch('/api/articles/1')
+        .send({
+            inc_votes: 100
+        })
+        .expect(200)
+        .then((response) => {
+            const article = response.body.article;
+            const input = article.votes - 100;
+            expect(input).toBe(article.votes - 100)
+        })
+    })
+
+    test('returns 400 Bad Request when inc_votes is inputted', () => {
+        return request(app)
+        .patch('/api/articles/twenty')
+        .send({
+            inc_votes: 'one hundred'
+        })
+        .expect(400)
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('Bad Request')
+        })
+    })
+
+    test('returns 400 Bad Request when invalid article_id is inputted', () => {
+        return request(app)
+        .patch('/api/articles/twenty')
+        .send({
+            inc_votes: 100
+        })
+        .expect(400)
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('Bad Request')
+        })
+    })
+
+    test('returns 404 Not Found when article_id is valid but the article does not exist', () => {
+        return request(app)
+        .patch('/api/articles/99')
+        .send({
+            inc_votes: 100
+        })
+        .expect(404)
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('Article Not Found')
+        })
+    })
 })

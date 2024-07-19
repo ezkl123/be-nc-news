@@ -117,5 +117,30 @@ function addComments(username, body, articleId){
     
 }
 
+function updateArticle(articleId, incVotes){
+    if (isNaN(articleId) || isNaN(incVotes)){
+        return Promise.reject({
+            status: 400,
+            msg: 'Bad Request'
+        })
+    }
+    return db.query(`SELECT * FROM articles WHERE article_id = $1;`, [articleId])
+    .then(({rows}) => {
+        if (rows.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: 'Article Not Found'
+            })
+        }
+        const article = rows[0];
+        const updatedVotes = article.votes + incVotes
+        return db.query('UPDATE articles SET votes = $1 WHERE article_id = $2 RETURNING*;', [updatedVotes, articleId])
+        .then(({rows}) => {
+            const updatedArticle = rows[0];
+            return updatedArticle;
+        })
+    })
+}
 
-module.exports = { getTopics, getArticlebyId, getAllArticles, getAllComments, addComments }
+
+module.exports = { getTopics, getArticlebyId, getAllArticles, getAllComments, addComments, updateArticle }
