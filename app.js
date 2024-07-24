@@ -1,5 +1,5 @@
 const express = require('express')
-const { sendTopics, sendAllEndpoints, sendArticleById, sendAllArticles, sendAllComments, postComments, sendUpdatedArticle, sendDeleteResponse } = require('./controllers/controllers')
+const { sendTopics, sendAllEndpoints, sendArticleById, sendAllArticles, sendAllComments, postComments, sendUpdatedArticle, sendDeleteResponse, sendUsers } = require('./controllers/controllers')
 
 const app = express()
 
@@ -20,6 +20,12 @@ app.post('/api/articles/:article_id/comments', postComments)
 app.patch('/api/articles/:article_id', sendUpdatedArticle)
 
 app.delete('/api/comments/:comment_id', sendDeleteResponse)
+
+app.get('/api/users', sendUsers)
+
+app.all('*', (req, res, next) => {
+    res.status(400).send({msg: 'Bad Request'})
+})
 
 app.use((err, req, res, next) => {
     if (err.status && err.msg){
@@ -46,7 +52,6 @@ app.use((err, req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
-    // console.log(err);
     res.status(500).send({msg: 'Internal Server Error'})
 })
 

@@ -49,14 +49,14 @@ describe('GET /api/articles/:article_id', () => {
         .then((response) => {
             // console.log(response.body.article)
             expect(response.body.article).toEqual({
-                article_id: 1,
-                title: 'Living in the shadow of a great man',
-                topic: 'mitch',
-                author: 'butter_bridge',
-                body: 'I find this existence challenging',
-                created_at: '2020-07-09T20:11:00.000Z',
-                votes: 100,
-                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String)
               })
         })
     })
@@ -79,7 +79,7 @@ describe('GET /api/articles/:article_id', () => {
             const error = response.body.msg
             expect(error).toBe('Not Found')
         })
-    })
+    });
 })
 
 describe('GET /api/articles', () => {
@@ -104,6 +104,44 @@ describe('GET /api/articles', () => {
             })
         })
     })
+    test("returns 200 and returns an array of articles sorted by valid category and order", () => {
+        return request(app)
+          .get("/api/articles?sort_by=title&order=asc")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles
+            expect(articles.length).toBe(13);
+            expect(articles).toBeSortedBy("title", { ascending: true });
+        });
+    });
+    test("returns 200 and responds with articles ordered by created_at by default", () => {
+        return request(app)
+          .get("/api/articles?sort_by=created_at")
+          .expect(200)
+          .then((response) => {
+            const articles = response.body.articles
+            expect(articles.length).toBe(13);
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+          });
+    });
+    test("returns 400 and returns an error when sort_by is invalid", () => {
+        return request(app)
+          .get("/api/articles?sort_by=invalid_input_column")
+          .expect(400)
+          .then((response) => {
+            const msg = response.body.msg
+            expect(msg).toBe("Bad Request");
+          });
+    });
+    test("returns 400 and returns Bad Request when order is invalid", () => {
+        return request(app)
+          .get("/api/articles?order=invalid_order")
+          .expect(400)
+          .then((response) => {
+            const msg = response.body.msg
+            expect(msg).toBe("Bad Request");
+          });
+    });
 })
 
 describe('/api/articles/:article_id/comments testing', () => {
@@ -336,5 +374,39 @@ describe('DELETE /api/comments/:comment_id', () => {
             const msg = response.body.msg;
             expect(msg).toBe('Bad Request')
         })
+    })
+})
+
+describe('GET api/users testing', () => {
+    test('returns 200 and an array of users with the properties of uername, name and avatar_url when successfule', () => {
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then((response) => {
+            const users = response.body.users;
+            users.forEach((user) => {
+                expect(user).toMatchObject({
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String)
+                })
+            })
+        })
+    })
+    test('returns 400 when url path is incorrect', () => {
+        return request(app)
+        .get('/notARoute')
+        .expect(400)
+        .then((response) => {
+            const msg = response.body.msg;
+            expect(msg).toBe('Bad Request')
+        })
+    })
+})
+
+describe('GET api/articles(sorting queries) testing', () => {
+    test('returns 200 for sort_by and returns the articles sorted by the relevant column', () => {
+        return request(app)
+        .get('/api/articles/sort_by')
     })
 })

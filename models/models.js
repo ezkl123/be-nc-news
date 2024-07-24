@@ -21,7 +21,18 @@ function getArticlebyId(article_id){
     })
 }
 
-function getAllArticles(){
+function getAllArticles(sortBy = 'created_at', order = 'desc'){
+    const sortByQueries = ['article_id', 'title', 'topic', 'author', 'created_at', 'votes', 'comment_count'];
+
+    const orderQueries = ['asc', 'desc'];
+
+    if (!sortByQueries.includes(sortBy) || !orderQueries.includes(order)){
+        return Promise.reject({
+            status: 400,
+            msg:'Bad Request'
+        })
+
+    }
 
     return db.query(`
         SELECT
@@ -39,7 +50,7 @@ function getAllArticles(){
         GROUP BY
             articles.article_id
         ORDER BY
-            articles.created_at DESC;`
+            articles.${sortBy} ${order};`
     ).then((response) => {
         const rows = response.rows
         rows.forEach((article) => {
@@ -159,5 +170,14 @@ function deleteComment(comment_id){
     })
 }
 
+function getUsers(){
+    return db.query('SELECT * FROM users')
+    .then(({rows}) => {
+        const users = rows;
 
-module.exports = { getTopics, getArticlebyId, getAllArticles, getAllComments, addComments, updateArticle, deleteComment }
+        return rows;
+    })
+}
+
+
+module.exports = { getTopics, getArticlebyId, getAllArticles, getAllComments, addComments, updateArticle, deleteComment, getUsers }
