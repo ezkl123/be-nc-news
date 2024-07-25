@@ -31,8 +31,8 @@ function sendArticleById(req, res, next){
 }
 
 function sendAllArticles(req, res, next){
-    const {sort_by, order} = req.query
-    return getAllArticles(sort_by, order)
+    const {sort_by, order, topic} = req.query
+    return getAllArticles(sort_by, order, topic)
     .then((articles) => {
         res.status(200).send({articles})
     })

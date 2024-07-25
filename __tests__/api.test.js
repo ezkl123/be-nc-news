@@ -103,7 +103,8 @@ describe('GET /api/articles', () => {
                 });
             })
         })
-    })
+    });
+
     test("returns 200 and returns an array of articles sorted by valid category and order", () => {
         return request(app)
           .get("/api/articles?sort_by=title&order=asc")
@@ -114,6 +115,7 @@ describe('GET /api/articles', () => {
             expect(articles).toBeSortedBy("title", { ascending: true });
         });
     });
+
     test("returns 200 and responds with articles ordered by created_at by default", () => {
         return request(app)
           .get("/api/articles?sort_by=created_at")
@@ -124,6 +126,7 @@ describe('GET /api/articles', () => {
             expect(articles).toBeSortedBy("created_at", { descending: true });
           });
     });
+
     test("returns 400 and returns an error when sort_by is invalid", () => {
         return request(app)
           .get("/api/articles?sort_by=invalid_input_column")
@@ -133,6 +136,7 @@ describe('GET /api/articles', () => {
             expect(msg).toBe("Bad Request");
           });
     });
+
     test("returns 400 and returns Bad Request when order is invalid", () => {
         return request(app)
           .get("/api/articles?order=invalid_order")
@@ -142,6 +146,17 @@ describe('GET /api/articles', () => {
             expect(msg).toBe("Bad Request");
           });
     });
+
+    test('returns 200 and returns with articles filtered by topic when topic query is used', () => {
+        return request(app)
+        .get('/api/articles?topic=mitch')
+        .expect(200)
+        .then(({body}) => {
+            const articles = body.articles;
+            expect(articles).toBeSortedBy("mitch")
+        })
+
+    })
 })
 
 describe('/api/articles/:article_id/comments testing', () => {
