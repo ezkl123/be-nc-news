@@ -21,12 +21,26 @@ function getArticlebyId(article_id){
     })
 }
 
-function getAllArticles(sortBy = 'created_at', order = 'desc', topic = 'mitch'){
+function getAllArticles(sortBy = 'created_at', order = 'desc', topic){
     const sortByQueries = ['article_id', 'title', 'topic', 'author', 'created_at', 'votes', 'comment_count'];
 
     const orderQueries = ['asc', 'desc'];
 
-    const topicQueries = ['mitch', 'cats'];
+    const topicQueries = ['mitch', 'cat']
+
+    if (topic !== undefined){
+        if (!topicQueries.includes(topic)){
+            return Promise.reject({
+                status: 400,
+                msg: 'Bad Request'
+            })
+        }
+        return db.query(`SELECT * FROM articles WHERE articles.topic = $1;`, [topic])
+        .then(({rows}) => {
+            return rows;
+        })
+    }
+
 
     if (!sortByQueries.includes(sortBy) || !orderQueries.includes(order) || !topicQueries.includes(topic)){
         return Promise.reject({

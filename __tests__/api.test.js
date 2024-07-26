@@ -153,11 +153,23 @@ describe('GET /api/articles', () => {
         .expect(200)
         .then(({body}) => {
             const articles = body.articles;
-            expect(articles).toBeSortedBy("mitch")
+            articles.forEach((article) => {
+                expect(article.topic).toBe("mitch")
+            })
         })
+    })
 
+    test('returns 400 Bad Request when topic does not exist', () => {
+        return request(app)
+        .get('/api/articles?topic=dog')
+        .expect(400)
+        .then(({body}) => {
+            const msg = body.msg;
+            expect(msg).toBe('Bad Request')
+        })
     })
 })
+
 
 describe('/api/articles/:article_id/comments testing', () => {
     test('returns a 200 status and an array of comments for an article accessed by a valid id', () => {
