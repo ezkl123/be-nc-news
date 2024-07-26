@@ -42,7 +42,7 @@ function getAllArticles(sortBy = 'created_at', order = 'desc', topic){
     }
 
 
-    if (!sortByQueries.includes(sortBy) || !orderQueries.includes(order) || !topicQueries.includes(topic)){
+    if (!sortByQueries.includes(sortBy) || !orderQueries.includes(order)){
         return Promise.reject({
             status: 400,
             msg:'Bad Request'

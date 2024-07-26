@@ -323,13 +323,41 @@ describe('PATCH /api/articles/:article_id', () => {
         return request(app)
         .patch('/api/articles/1')
         .send({
-            inc_votes: 100
+            inc_votes: 1
         })
         .expect(200)
-        .then((response) => {
-            const article = response.body.article;
-            const input = article.votes - 100;
-            expect(input).toBe(article.votes - 100)
+        .then(({body}) => {
+            expect(body.article).toMatchObject({
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                created_at: "2020-07-09T20:11:00.000Z",
+                votes: 101,
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+              })
+        })
+    });
+
+    test('returns 200 with the updated number of votes in the article', () => {
+        return request(app)
+        .patch('/api/articles/1')
+        .send({
+            inc_votes: -1
+        })
+        .expect(200)
+        .then(({body}) => {
+            expect(body.article).toMatchObject({
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                created_at: "2020-07-09T20:11:00.000Z",
+                votes: 99,
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+              })
         })
     })
 
@@ -411,6 +439,7 @@ describe('GET api/users testing', () => {
         .expect(200)
         .then((response) => {
             const users = response.body.users;
+            expect(users).toHaveLength(4)
             users.forEach((user) => {
                 expect(user).toMatchObject({
                     username: expect.any(String),
@@ -428,12 +457,5 @@ describe('GET api/users testing', () => {
             const msg = response.body.msg;
             expect(msg).toBe('Bad Request')
         })
-    })
-})
-
-describe('GET api/articles(sorting queries) testing', () => {
-    test('returns 200 for sort_by and returns the articles sorted by the relevant column', () => {
-        return request(app)
-        .get('/api/articles/sort_by')
     })
 })
