@@ -9,7 +9,7 @@
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed": "node ./db/seeds/run-seed.js",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install || true"
   },
   "repository": {
     "type": "git",
@@ -30,9 +30,9 @@
     "supertest": "^7.0.0"
   },
   "dependencies": {
-    "husky": "^8.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
+    "husky": "^8.0.2",
     "express": "^4.19.2",
     "pg": "^8.12.0"
   },
